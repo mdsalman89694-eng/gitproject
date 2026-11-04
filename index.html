@@ -1,55 +1,675 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>How Mobile Works</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3D Mobile Circuit Explorer</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #07111f;
+    color: white;
+}
+
+header {
+    text-align: center;
+    padding: 30px 15px;
+    background: #10243a;
+}
+
+header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #a9bed4;
+}
+
+.container {
+    max-width: 1100px;
+    margin: auto;
+    padding: 20px;
+}
+
+.controls {
+    text-align: center;
+    margin: 15px;
+}
+
+button {
+    padding: 12px 18px;
+    border: 1px solid #45617e;
+    border-radius: 10px;
+    background: #17344f;
+    color: white;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background: #087da5;
+}
+
+.power {
+    background: #008fbd;
+    font-weight: bold;
+}
+
+.main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.panel {
+    background: #10243a;
+    border: 1px solid #29425e;
+    border-radius: 18px;
+    padding: 20px;
+}
+
+.scene {
+    min-height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(#19435b, #081522);
+    perspective: 1000px;
+    overflow: hidden;
+    border-radius: 15px;
+    margin-top: 15px;
+}
+
+.phone {
+    width: 230px;
+    height: 450px;
+    background: #1b2b3d;
+    border: 5px solid #8096a9;
+    border-radius: 30px;
+    position: relative;
+    transform: rotateY(-20deg) rotateX(8deg);
+    transform-style: preserve-3d;
+    box-shadow: 20px 25px 40px #000;
+    transition: 0.5s;
+    animation: float 4s infinite ease-in-out;
+}
+
+@keyframes float {
+    50% {
+        transform: rotateY(-15deg) rotateX(5deg) translateY(-10px);
+    }
+}
+
+.board {
+    position: absolute;
+    inset: 12px;
+    background: #104b3e;
+    border-radius: 20px;
+    border: 2px solid #4c9c7c;
+}
+
+.board:before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(#ffffff15 1px, transparent 1px),
+        linear-gradient(90deg, #ffffff15 1px, transparent 1px);
+    background-size: 15px 15px;
+}
+
+.component {
+    position: absolute;
+    background: linear-gradient(145deg, #496579, #142b3c);
+    border: 2px solid #a3c1cf;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 5px;
+    font-size: 11px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 2;
+    box-shadow: 4px 5px 8px #0008;
+    transition: 0.3s;
+}
+
+.component:hover,
+.component.selected {
+    border-color: #ffbd59;
+    box-shadow: 0 0 18px #ffbd59;
+    transform: translateZ(15px) scale(1.08);
+}
+
+.battery {
+    width: 75px;
+    height: 90px;
+    left: 15px;
+    top: 30px;
+    background: #285b39;
+}
+
+.cpu {
+    width: 95px;
+    height: 100px;
+    right: 12px;
+    top: 155px;
+    background: #26384d;
+}
+
+.modem {
+    width: 75px;
+    height: 55px;
+    left: 15px;
+    top: 275px;
+}
+
+.camera {
+    width: 65px;
+    height: 55px;
+    right: 15px;
+    top: 25px;
+}
+
+.antenna {
+    width: 85px;
+    height: 50px;
+    right: 12px;
+    bottom: 30px;
+    background: #44336b;
+}
+
+.poweric {
+    width: 75px;
+    height: 48px;
+    left: 15px;
+    bottom: 35px;
+}
+
+.trace {
+    position: absolute;
+    background: #4df0a6;
+    height: 3px;
+    box-shadow: 0 0 8px #4df0a6;
+    opacity: 0;
+}
+
+.phone.on .trace {
+    opacity: 1;
+    animation: flow 1s linear infinite;
+}
+
+@keyframes flow {
+    0% { filter: brightness(0.5); }
+    50% { filter: brightness(2); }
+    100% { filter: brightness(0.5); }
+}
+
+.trace1 {
+    width: 100px;
+    top: 130px;
+    left: 50px;
+}
+
+.trace2 {
+    width: 100px;
+    top: 245px;
+    left: 40px;
+}
+
+.trace3 {
+    width: 100px;
+    top: 355px;
+    left: 50px;
+}
+
+.front-screen {
+    position: absolute;
+    inset: 0;
+    border-radius: 25px;
+    background: linear-gradient(145deg, #071321, #123e61);
+    border: 2px solid #a4c6dc;
+    transform: translateZ(20px);
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    transition: 0.5s;
+    pointer-events: none;
+}
+
+.front-screen h2 {
+    margin: 10px;
+}
+
+.front-screen p {
+    color: #b8cde0;
+}
+
+.phone.screen-view .front-screen {
+    opacity: 1;
+}
+
+.details {
+    margin-top: 20px;
+}
+
+.details h2 {
+    color: #45d9ff;
+    margin-bottom: 15px;
+}
+
+.details p {
+    color: #b4c5d9;
+    line-height: 1.7;
+    margin-top: 10px;
+}
+
+.status {
+    color: #62f0ad;
+    margin: 15px 0;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.step {
+    padding: 15px 8px;
+    text-align: center;
+    background: #10243a;
+    border: 1px solid #29425e;
+    border-radius: 10px;
+    color: #a9bed4;
+    font-size: 12px;
+}
+
+.step strong {
+    display: block;
+    color: white;
+    margin: 8px 0;
+}
+
+.step.active {
+    border-color: #62f0ad;
+    background: #174435;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #8199b4;
+}
+
+@media(max-width: 750px) {
+    .main {
+        grid-template-columns: 1fr;
+    }
+
+    .steps {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>How Does a Mobile Work?</h1>
-        <p>Explore the working process of a smartphone</p>
-    </header>
+<header>
+    <h1>How Does a Mobile Work?</h1>
+    <p>Explore the internal smartphone circuit in 3D</p>
+</header>
 
-    <section class="container">
-        <h2>Working Process of Mobile</h2>
+<div class="container">
 
-        <div class="phone">
-            <div class="screen" id="screen">
-                <h3>Welcome!</h3>
-                <p>Press the power button</p>
+    <div class="controls">
+        <button class="power" onclick="togglePower()" id="powerBtn">
+            ⚡ Power ON
+        </button>
+
+        <button onclick="playSequence()">
+            ▶ Start Simulation
+        </button>
+
+        <button onclick="resetPhone()">
+            Reset
+        </button>
+    </div>
+
+    <div class="main">
+
+        <section class="panel">
+            <h2>3D Mobile Circuit</h2>
+
+            <div class="scene">
+
+                <div class="phone" id="phone">
+
+                    <div class="board">
+
+                        <div class="trace trace1"></div>
+                        <div class="trace trace2"></div>
+                        <div class="trace trace3"></div>
+
+                        <div class="component battery selected"
+                             onclick="showDetails('battery', this)">
+                            🔋<br>BATTERY
+                        </div>
+
+                        <div class="component cpu"
+                             onclick="showDetails('cpu', this)">
+                            🧠<br>PROCESSOR
+                        </div>
+
+                        <div class="component modem"
+                             onclick="showDetails('modem', this)">
+                            MODEM
+                        </div>
+
+                        <div class="component camera"
+                             onclick="showDetails('camera', this)">
+                            📷<br>CAMERA
+                        </div>
+
+                        <div class="component antenna"
+                             onclick="showDetails('antenna', this)">
+                            📡<br>ANTENNA
+                        </div>
+
+                        <div class="component poweric"
+                             onclick="showDetails('power', this)">
+                            ⚡<br>POWER IC
+                        </div>
+
+                    </div>
+
+                    <div class="front-screen">
+                        <div style="font-size:55px">📱</div>
+                        <h2 id="screenTitle">Welcome!</h2>
+                        <p id="screenText">Mobile is ready</p>
+                    </div>
+
+                </div>
+
             </div>
-            <button onclick="startPhone()">Power ON</button>
+        </section>
+
+        <section class="panel">
+
+            <h2>Component Information</h2>
+
+            <div class="details">
+
+                <h2 id="partTitle">Battery</h2>
+
+                <p id="partDescription">
+                    The battery stores electrical energy and
+                    supplies power to the mobile phone.
+                </p>
+
+                <p class="status" id="partStatus">
+                    Status: Standby
+                </p>
+
+                <hr style="border-color:#29425e;margin:20px 0">
+
+                <h3>Select a component</h3>
+
+                <button onclick="selectPart('battery')">Battery</button>
+                <button onclick="selectPart('cpu')">Processor</button>
+                <button onclick="selectPart('power')">Power IC</button>
+                <button onclick="selectPart('modem')">Modem</button>
+                <button onclick="selectPart('antenna')">Antenna</button>
+                <button onclick="selectPart('camera')">Camera</button>
+
+                <p id="simulationMessage" style="margin-top:20px">
+                    Select a component to learn how it works.
+                </p>
+
+            </div>
+
+        </section>
+
+    </div>
+
+    <section class="panel" style="margin-top:25px">
+
+        <h2>Mobile Working Process</h2>
+
+        <div class="steps" id="steps">
+
+            <div class="step">
+                🔋
+                <strong>Battery</strong>
+                Supplies power
+            </div>
+
+            <div class="step">
+                ⚡
+                <strong>Power IC</strong>
+                Controls voltage
+            </div>
+
+            <div class="step">
+                🧠
+                <strong>Processor</strong>
+                Processes data
+            </div>
+
+            <div class="step">
+                📡
+                <strong>Antenna</strong>
+                Sends signals
+            </div>
+
+            <div class="step">
+                📱
+                <strong>Display</strong>
+                Shows information
+            </div>
+
         </div>
 
-        <div class="steps">
-            <div class="card">
-                <h3>1. Power Supply</h3>
-                <p>The battery supplies electrical energy to the mobile.</p>
-            </div>
-
-            <div class="card">
-                <h3>2. Processor</h3>
-                <p>The processor controls and processes instructions.</p>
-            </div>
-
-            <div class="card">
-                <h3>3. Network</h3>
-                <p>The antenna receives and sends signals.</p>
-            </div>
-
-            <div class="card">
-                <h3>4. Display</h3>
-                <p>The screen displays images, videos and information.</p>
-            </div>
-        </div>
     </section>
 
-    <footer>
-        <p>Mobile Working Process | Created using HTML, CSS and JavaScript</p>
-    </footer>
+</div>
 
-    <script src="script.js"></script>
+<footer>
+    Mobile Working Process | Interactive HTML Project
+</footer>
+
+<script>
+
+const phone = document.getElementById("phone");
+
+let isOn = false;
+let demoTimer;
+
+const information = {
+
+    battery: {
+        title: "Battery",
+        description:
+        "The battery stores electrical energy and supplies DC power to the mobile phone."
+    },
+
+    cpu: {
+        title: "Processor (CPU)",
+        description:
+        "The processor is the brain of the mobile. It executes instructions, runs applications and controls different operations."
+    },
+
+    power: {
+        title: "Power Management IC",
+        description:
+        "The Power IC regulates voltage and distributes suitable electrical power to different mobile components."
+    },
+
+    modem: {
+        title: "Network Modem",
+        description:
+        "The modem processes cellular communication data and helps the mobile connect to a mobile network."
+    },
+
+    antenna: {
+        title: "Antenna",
+        description:
+        "The antenna sends and receives radio signals between the mobile phone and wireless networks."
+    },
+
+    camera: {
+        title: "Camera",
+        description:
+        "The camera sensor captures light and converts it into electronic signals to create photos and videos."
+    }
+
+};
+
+function showDetails(name, element) {
+
+    const item = information[name];
+
+    document.getElementById("partTitle").innerText =
+        item.title;
+
+    document.getElementById("partDescription").innerText =
+        item.description;
+
+    document.getElementById("partStatus").innerText =
+        "Status: " + (isOn ? "Active" : "Standby");
+
+    document.querySelectorAll(".component").forEach(el => {
+        el.classList.remove("selected");
+    });
+
+    if (element) {
+        element.classList.add("selected");
+    }
+
+    document.getElementById("simulationMessage").innerText =
+        "You selected: " + item.title;
+}
+
+function selectPart(name) {
+
+    const element = document.querySelector(
+        "." + (name === "power" ? "poweric" : name)
+    );
+
+    showDetails(name, element);
+
+}
+
+function togglePower() {
+
+    isOn = !isOn;
+
+    phone.classList.toggle("on", isOn);
+
+    document.getElementById("powerBtn").innerText =
+        isOn ? "⏻ Power OFF" : "⚡ Power ON";
+
+    document.getElementById("screenTitle").innerText =
+        isOn ? "Welcome!" : "Powered OFF";
+
+    document.getElementById("screenText").innerText =
+        isOn ? "Mobile is working" : "Press Power ON";
+
+    document.getElementById("partStatus").innerText =
+        "Status: " + (isOn ? "Active" : "Standby");
+
+    document.getElementById("simulationMessage").innerText =
+        isOn ? "Power is flowing through the circuit!" :
+        "The mobile phone is switched off.";
+
+    document.querySelectorAll(".step").forEach((step, index) => {
+        step.classList.toggle("active", isOn && index < 3);
+    });
+
+}
+
+function playSequence() {
+
+    if (!isOn) {
+        togglePower();
+    }
+
+    clearInterval(demoTimer);
+
+    const names = [
+        "battery",
+        "power",
+        "cpu",
+        "modem",
+        "antenna"
+    ];
+
+    let index = 0;
+
+    function nextStep() {
+
+        if (index >= names.length) {
+
+            clearInterval(demoTimer);
+
+            document.getElementById("simulationMessage").innerText =
+                "Simulation completed! The mobile is powered and communicating.";
+
+            phone.classList.add("screen-view");
+
+            return;
+        }
+
+        selectPart(names[index]);
+
+        document.querySelectorAll(".step").forEach((step, i) => {
+            step.classList.toggle("active", i <= index);
+        });
+
+        index++;
+
+    }
+
+    nextStep();
+
+    demoTimer = setInterval(nextStep, 1500);
+
+}
+
+function resetPhone() {
+
+    clearInterval(demoTimer);
+
+    phone.classList.remove("screen-view");
+
+    if (isOn) {
+        togglePower();
+    }
+
+    selectPart("battery");
+
+    document.querySelectorAll(".step").forEach(step => {
+        step.classList.remove("active");
+    });
+
+    document.getElementById("simulationMessage").innerText =
+        "Simulation reset. Ready to start.";
+
+}
+
+</script>
+
 </body>
 </html>
